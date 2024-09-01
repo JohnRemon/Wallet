@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}
+    Edit Account
+{% endblock %}
+{% block main %}
+<div class="container py-1">
+    <div class="form-container">
+        <form action="/accounts/edit/{{ account.account_id }}" method="post">
+            <div class="d-flex flex-column gap-3">
+                <div class="form-group">
+                    <label for="accountName">Name</label>
+                    <input type="text" class="form-control" name="name" id="accountName" value="{{ account.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="typeSelect">Account Type</label>
+                    <select class="form-select" id="typeSelect" name="type" required>
+                        <option value="General" {% if account.type == "General" %}selected{% endif %}>General</option>
+                        <option value="Cash" {% if account.type == "Cash" %}selected{% endif %}>Cash</option>
+                        <option value="Bank" {% if account.type == "Bank" %}selected{% endif %}>Bank</option>
+                        <option value="Credit Card" {% if account.type == "Credit Card" %}selected{% endif %}>Credit Card</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="initialAmount" class="form-label">Balance</label>
+                    <input type="number" class="form-control" id="initialAmount" name="initial" value="{{ account.balance }}" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Update Account</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

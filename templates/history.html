@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+<div class="container text-center">
+    <div class="row">
+        <div class="col-sm-3">
+            <h2 class="h2">Record</h2>
+            <form action="/add-record" method="get">
+                <button type="submit" class="btn btn-primary">+ Add</button>
+            </form>
+            <h5 class="h5 my-3">Filter</h5>
+            <form action="/history" method="post">
+                <div class="form-group">
+                    <label for="accountSelect">Select an Account</label>
+                    <select class="form-select" id="accountSelect" name="account">
+                        <option value="All">All</option>
+                        {% for account in accounts %}
+                            <option value="{{ account.account_id }}">{{ account["name"] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="categorySelect">Select a Category</label>
+                    <select class="form-select" id="categorySelect" name="category">
+                        <option value="All">All</option>
+                        {% for category in categories %}
+                            <option value="{{ category.category_id }}">{{ category["name"] }}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="recordTypeSelect">Select a Record Type</label>
+                    <select class="form-select" id="recordTypeSelect" name="record_type">
+                        <option value="All">Both</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payeeSearch">Payee </label>
+                    <input type="search" placeholder="Search" class="form-control" name="payee">
+                </div>
+                <div class="form-group">
+                    <label for="descriptionSearch">Description</label>
+                    <input type="search" placeholder="Search" class="form-control" name="description">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" class="form-control" name="start_date">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="endDate">End Date</label>
+                            <input type="date" class="form-control" name="end_date">
+                        </div>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+            <p class="text-muted mt-3 mb-2"><strong>Count: {{count}}</strong></p>
+        </div>
+        <div class="col-sm-9">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-start">Category</th>
+                        <th class="text-end">Description</th>
+                        <th class="text-end">Payee</th>
+                        <th class="text-end">Date</th>
+                        <th class="text-end">Account</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td class="text-start">
+                                {% if transaction.sub_category_name %}
+                                    {{ transaction.sub_category_name }}
+                                {% else %}
+                                    {{ transaction.category_name }}
+                                {% endif %}
+                            </td>
+                            <td class="text-end">{{ transaction.description }}</td>
+                            <td class="text-end">{{ transaction.payee }}</td>
+                            <td class="text-end">{{ transaction.transaction_date }}</td>
+                            <td class="text-end">{{ transaction.account_name }}</td>
+                            {% if transaction.type == "expense" %}
+                                <td class="text-end" style="color: red;"><strong>{{ transaction.amount }}</strong></td>
+                            {% else %}
+                                <td class="text-end" style="color: green;"><strong>{{ transaction.amount }}</strong></td>
+                            {% endif %}
+                            <td class="text-end">
+                                <button class="btn dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/history/edit/{{transaction.transactions_id}}">Edit</a></li>
+                                    <form action="/history/delete/{{ transaction.transactions_id }}" method="post" class="d-inline">
+                                        <button type="submit" class="dropdown-item red" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button>
+                                    </form>
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text-end"><strong>Total:</strong></td>
+                        <td class="text-end">
+                            <strong
+                                style="color: {% if total_amount < 0 %}red{% else %}green{% endif %};">
+                                {{ total_amount }}
+                            </strong>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

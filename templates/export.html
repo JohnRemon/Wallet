@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+
+{% block title %}
+    Export
+{% endblock %}
+{% block main %}
+<div class="container py-1">
+    <div class="form-container">
+        <form action="/export" method="post">
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex justify-content-center gap-3 mb-3">
+                <div class="form-group">
+                    <label for="accountSelect">Select an Account</label>
+                    <select class="form-select" id="accountSelect" name="account">
+                        <option value="default" selected disabled>Select an Account</option>
+                        {% for account in accounts %}
+                            <option value="{{ account.account_id }}">{{ account["name"] }}</option>
+                        {% endfor %}
+                        <option value="all">All</option>
+                    </select>
+
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Export</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

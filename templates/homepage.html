@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+{% block title %}
+    Home
+{% endblock %}
+{% block main %}
+
+<div class="container d-flex justify-content-center">
+    <div class="row mb-3">
+        <div class="col">
+             <form action="/" method="post">
+                <select id="account-select" class="form-select mb-3" name="account_id">
+                    <option value="All" default>All</option>
+                    {% for account in accounts %}
+                        <option value="{{ account.account_id }}">{{ account.name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="period-selection mb-4">
+                    <label>
+                        <input type="radio" name="period" value="week" class="form-check-input m-2">
+                        This Week
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="month" class="form-check-input m-2" checked>
+                        This Month
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="year" class="form-check-input m-2">
+                        This Year
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="custom" class="form-check-input m-2">
+                        Custom Date Range
+                    </label>
+
+                    <!-- Custom Date Range Picker -->
+                    <div id="custom-date-range" style="display: none;">
+                        <input type="date" id="start-date" name="start_date">
+                        to
+                        <input type="date" id="end-date" name="end_date">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <p>Please Press Submit to get the Data</p>
+             </form>
+        </div>
+    </div>
+</div>
+
+<div id="chart-wrapper">
+    <div id="chart-container1" class="card m-5 shadow-sm">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div id="chart-container2" class="card m-5 shadow-sm">
+        <canvas id="myChart2"></canvas>
+    </div>
+    <div id="info-container" class="card m-5 p-4 shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h5 class="card-title">Balance: <span class="text-success">{{ current_balance }}</span></h5>
+                </div>
+                <div class="col-12 mb-3">
+                    <h5 class="card-title">Cashflow: <span class="text-primary">{{ cashflow }}</span></h5>
+                </div>
+                <div class="col-12">
+                    <h5 class="card-title">Spending: <span class="text-danger">{{ total_expenses }}</span></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Function to handle period selection
+    document.querySelectorAll('input[name="period"]').forEach((elem) => {
+        elem.addEventListener('change', function() {
+            const customRange = document.getElementById('custom-date-range');
+            if (this.value === 'custom') {
+                customRange.style.display = 'block';
+            } else {
+                customRange.style.display = 'none';
+            }
+        });
+    });
+
+    const labels = {{ labels|tojson }};
+    const balances = {{ balances|tojson }};
+    const labels2 = {{ labels2|tojson }};
+    const expenses = {{ expenses|tojson }};
+
+    // Running Balance Chart
+    const data1 = {
+        labels: labels,
+        datasets: [{
+            label: 'Balance',
+            data: balances,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    };
+
+    const config1 = {
+        type: 'line',
+        data: data1,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        },
+    };
+
+    const ctx1 = document.getElementById('myChart').getContext('2d');
+    const myChart1 = new Chart(ctx1, config1);
+
+    // Expenses Doughnut Chart
+    const data2 = {
+        labels: labels2,
+        datasets: [{
+            label: 'Expenses',
+            data: expenses,
+            hoverOffset: 4
+        }]
+    };
+
+    const config2 = {
+        type: 'doughnut',
+        data: data2,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        },
+    };
+
+    const ctx2 = document.getElementById('myChart2').getContext('2d');
+    const myChart2 = new Chart(ctx2, config2);
+</script>
+
+<style>
+    #chart-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    #chart-container1, #chart-container2, #info-container {
+        width: 300px;
+        height: 300px;
+    }
+
+    #myChart, #myChart2 {
+        width: 300px !important;
+        height: 300px !important;
+    }
+</style>
+
+{% endblock %}

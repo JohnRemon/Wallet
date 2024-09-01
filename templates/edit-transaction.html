@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Record
+{% endblock %}
+{% block main %}
+<div class="container py-1">
+    <div class="form-container">
+        <form action="/history/edit/{{ transaction.transactions_id }}" method="post">
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex justify-content-center gap-3 mb-3">
+                    <div class="form-check">
+                        <input type="radio" id="expenseRadio" name="recordType" value="expense" class="form-check-input"
+                            {% if transaction.type == 'expense' %}checked{% endif %}>
+                        <label class="form-check-label" for="expenseRadio">Expense</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="incomeRadio" name="recordType" value="income" class="form-check-input"
+                            {% if transaction.type == 'income' %}checked{% endif %}>
+                        <label class="form-check-label" for="incomeRadio">Income</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="accountSelect">Select an Account</label>
+                    <select class="form-select" id="accountSelect" name="account">
+                        <option value="default" disabled>Select an Account</option>
+                        {% for account in accounts %}
+                            <option value="{{ account.account_id }}"
+                                {% if account.account_id == transaction.account_id %}selected{% endif %}>
+                                {{ account.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="recordAmount" class="form-label">Amount</label>
+                    <input type="number" class="form-control" id="recordAmount" name="amount" step="0.01"
+                           value="{{ transaction.amount }}">
+                </div>
+                <div class="form-group">
+                    <label for="recordDescription" class="form-label">Description</label>
+                    <input type="string" class="form-control" id="recordDescription" name="description"
+                           value="{{ transaction.description }}">
+                </div>
+                <div class="form-group">
+                    <label for="recordPayee" class="form-label">Payee</label>
+                    <input type="string" class="form-control" id="recordPayee" name="payee"
+                           value="{{ transaction.payee }}">
+                </div>
+                <div class="form-group">
+                    <label for="categorySelect">Select a Category</label>
+                    <select class="form-select" id="categorySelect" name="category">
+                        <option value="default" disabled>Select a Category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.category_id }}"
+                                {% if category.category_id == transaction.category_id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="subCategorySelect">Select a Subcategory</label>
+                    <select class="form-select" id="subCategorySelect" name="subcategory">
+                        <option value="default" disabled>Select a Subcategory</option>
+                    </select>
+                </div>
+                <script>
+                    //used chatgpt for this
+                    // Convert sub_categories from Jinja to JavaScript
+                    const sub_categories = {{ sub_categories | tojson | safe }};
+                    console.log(sub_categories);
+
+                    // Populate subcategories based on selected category
+                    document.getElementById('categorySelect').addEventListener('change', function() {
+                        const selectedCategoryId = this.value;
+                        const subCategorySelect = document.getElementById('subCategorySelect');
+
+                        // Clear previous options
+                        subCategorySelect.innerHTML = '<option value="default" disabled>Select a Subcategory</option>';
+
+                        // Filter subcategories based on selected category
+                        const filteredSubCategories = sub_categories ? sub_categories.filter(sub => sub.main_category_id == selectedCategoryId) : [];
+                        filteredSubCategories.forEach(sub => {
+                            const option = document.createElement('option');
+                            option.value = sub.sub_category_id; // Use correct sub_category_id field
+                            option.textContent = sub.name;
+                            subCategorySelect.appendChild(option);
+                        });
+
+                        // Optionally, pre-select the previously selected subcategory
+                        const selectedSubCategoryId = "{{ transaction.sub_category_id }}"; // Get this value from server-side variable
+                        if (selectedSubCategoryId && selectedSubCategoryId !== "default") {
+                            subCategorySelect.value = selectedSubCategoryId;
+                        }
+                    });
+
+                    // Trigger change event to populate subcategories if a category is pre-selected
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const selectedCategoryId = document.getElementById('categorySelect').value;
+                        if (selectedCategoryId && selectedCategoryId !== "default") {
+                            document.getElementById('categorySelect').dispatchEvent(new Event('change'));
+                        }
+                    });
+                </script>
+                <div class="form-group">
+                    <label for="recordDate" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="recordDate" name="date"
+                           value="{{ transaction.time }}">
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Edit Record</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('expenseRadio').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('recordAmount').placeholder = '-';
+      }
+    });
+
+    document.getElementById('incomeRadio').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('recordAmount').placeholder = '+';
+      }
+    });
+
+    let today = new Date().toISOString().split('T')[0];
+    document.getElementById('recordDate').setAttribute('max', today);
+</script>
+{% endblock %}
