@@ -26,3 +26,5 @@ For the export page you can choose an account’s transactions or all the accoun
 
 Finally when clicking on the profile button on the top right corner of the page you have two options to either log out or change password. You can change your password by typing the old password and the new password two types to confirm. And like this my project is complete
 
+
+To run: type in your terminal flask run (having already installed flask)
