@@ -2,12 +2,12 @@ Wallet
 #### Video Demo: (https://youtu.be/gT3YQCyLQRk)
 
 A Personal Finance Tracker using:
-Python '\n'
-Flask '\n'
-Sqlite3 '\n'
+Python <br/>
+Flask <br/>
+Sqlite3 <br/>
 
 Features
-Creating a Transaction
-History of Transactions
-Use of Different Accounts
-Graphs to display data
+Creating a Transaction <br/>
+History of Transactions <br/>
+Use of Different Accounts <br/>
+Graphs to display data <br/>
